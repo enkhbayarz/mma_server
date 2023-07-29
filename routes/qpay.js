@@ -137,7 +137,10 @@ router.post('/create-invoice/:id/:productId/:coupon', async (req, res) => {
   
       res.status(200).json({
         status: 'success',
-        data: transaction
+        data: {
+          transaction: transaction,
+          qr: response.data.urls
+        }
         });
   
     } catch (error) {
