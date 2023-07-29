@@ -63,7 +63,7 @@ router.post('/create-invoice/:id/:productId/:coupon', async (req, res) => {
         return res.status(404).json({message: "product not found!"})
       }
       console.log(product)
-      const amount = 0;
+      let amount = 0;
 
       if(user.amount){
         amount = user.amount * product.duration;
