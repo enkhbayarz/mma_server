@@ -47,12 +47,12 @@ async function fetchToken() {
   }
 }
 
-router.post('/create-invoice/:id/:productId/:coupon', async (req, res) => {
+router.post('/create-invoice/:chatId/:productId/:coupon', async (req, res) => {
     try {
-      const { id, productId, coupon } = req.params; 
+      const { chatId, productId, coupon } = req.params; 
 
-      const user = await User.findById(id);
-  
+      const user = await User.findOne({chatId: chatId});
+ 
       if(!user){
         return res.status(404).json({message: "user not found!"})
       }
