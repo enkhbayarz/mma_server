@@ -92,4 +92,21 @@ router.post('/generate/:id', async(req, res) => {
     }
   })
 
+  router.get('/:coupon', async(req, res) => {
+    try {
+        const {coupon} = req.params;
+        const foundCoupon = await Coupon.findOne({code: coupon})
+
+        if(!foundCoupon){
+          return res.status(404).json({message: "coupon not found!"})
+        }
+ 
+        res.status(200).json(foundCoupon);
+  
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error.message}) 
+    }
+  })
+
   module.exports = router;
