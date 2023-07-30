@@ -302,42 +302,58 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
         }
         transaction.status = 'PAID';
       
-        const foundExtentension = await Extension.findOne({user: transaction.user._id});
+        const foundExtentension = await Extension.findOne({user: transaction.user._id})
+        .sort({ createdAt: -1 }) // Sort in descending order by createdAt
+        .limit(1);
+        
         console.log(`foundExtentension: ${foundExtentension}`)
-  
+
+        const foundProduct = await Product.findById(transaction.product._id)
+        if(!foundProduct){
+          return res.status(404).json({message: "product not found!"})
+        }  
+
         if(!foundExtentension){
           const currentDate = new Date();
           console.log(moment(currentDate).format('YYYY-MM-DD'));
-  
-          const addedDate = moment(currentDate).add(transaction.product.duration, 'months').format('YYYY-MM-DD');
+
+          console.log(foundProduct.duration) 
+
+          const addedDate = moment(currentDate).add(foundProduct.duration, 'months').format('YYYY-MM-DD');
 
           console.log(addedDate)
   
           const extension = new Extension({
             startDate: moment(currentDate).format('YYYY-MM-DD'), 
             endDate:addedDate, 
-            product: transaction.product,
-            user: transaction.user
+            product: foundProduct,
+            user: foundUser
           })
           await extension.save();
         } else {
           const currentDate = moment(foundExtentension.endDate, 'YYYY-MM-DD').toDate();
           console.log(currentDate);
+         
+          console.log(foundProduct.duration)
 
-          const futureDate = moment(currentDate).add(transaction.product.duration, 'months').format('YYYY-MM-DD');
+          const futureDate = moment(currentDate).add(foundProduct.duration, 'months').format('YYYY-MM-DD');
 
           console.log(`futureDate: ${futureDate}`)
 
           const extension = new Extension({
             startDate: moment(currentDate).format('YYYY-MM-DD'), 
             endDate: futureDate, 
-            product: transaction.product,
-            user: transaction.user
+            product: foundProduct,
+            user: foundUser
           })
           await extension.save();
         }
+
+       console.log(`!foundUser.amount: ${!foundUser.amount}`)
         if(!foundUser.amount){
-          foundUser.amount = transaction.product.amount;
+          foundUser.amount = foundProduct.amount;
+          console.log(foundUser);
+          foundUser.markModified('amount');
           await foundUser.save();
         }
 
@@ -347,7 +363,10 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
           const responseCoupon = await axios.post(`http://localhost:3000/coupon/${transaction.user._id}/${transaction.couponCode}`);
           console.log(responseCoupon.data)
         }
-      
+
+        const responseMessage = await axios.get(`https://api.telegram.org/bot6463008563:AAG5XPOwVdQv1BAWfY0aG96iEd7bZ6kG54Y/sendMessage?chat_id=${foundUser.chatId}&text=Төлбөр амжилттай төлөгдлөө`)
+        const responseMessage1 = await axios.get(`https://api.telegram.org/bot6463008563:AAG5XPOwVdQv1BAWfY0aG96iEd7bZ6kG54Y/sendMessage?chat_id=${foundUser.chatId}&text=/intro гэсэн коммандыг ашиглаарай`)     
+
         res.status(200).json({
           status: 'success',
           data: response.data

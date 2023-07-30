@@ -30,6 +30,8 @@ app.use('/transaction', transactionRoute);
 app.use('/extension', extensionRoute);
 app.use('/', qpayRoute);
 
+mongoose.set('strictQuery', false);
+
 mongoose.connect(process.env.DB_URL,{useNewUrlParser: true ,  useUnifiedTopology: true }).then( async () => {
     console.log(`MongoDb is connecting`)
     app.listen(process.env.PORT, () => {
