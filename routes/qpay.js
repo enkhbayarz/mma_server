@@ -48,107 +48,207 @@ async function fetchToken() {
 }
 
 router.post('/create-invoice/:chatId/:productId/:coupon', async (req, res) => {
-    try {
-      const { chatId, productId, coupon } = req.params; 
+  try {
+    const { chatId, productId, coupon } = req.params; 
 
-      const user = await User.findOne({chatId: chatId});
- 
-      if(!user){
-        return res.status(404).json({message: "user not found!"})
-      }
-  
-      const product = await Product.findById(productId)
-  
-      if(!product){
-        return res.status(404).json({message: "product not found!"})
-      }
-      console.log(product)
-      let amount = 0;
+    const user = await User.findOne({chatId: chatId});
 
-      if(user.amount){
-        amount = user.amount * product.duration;
-      } else {
-        amount = product.amount * product.duration;
+    if(!user){
+      return res.status(404).json({message: "user not found!"})
+    }
+
+    const product = await Product.findById(productId)
+
+    if(!product){
+      return res.status(404).json({message: "product not found!"})
+    }
+    console.log(product)
+    let amount = 0;
+
+    if(user.amount){
+      amount = user.amount * product.duration;
+    } else {
+      amount = product.amount * product.duration;
+    }
+    console.log(amount)
+
+    const data = {
+      "invoice_code": "TEST1_INVOICE",
+      "sender_invoice_no": "MABNK000001",
+      "invoice_receiver_code": "83",
+      "sender_branch_code": "BRANCH1",
+      "invoice_description": "Order No1311 4444.00",
+      "enable_expiry": "false",
+      "allow_partial": false,
+      "minimum_amount": null,
+      "allow_exceed": false,
+      "maximum_amount": null,
+      "amount": amount,
+      "callback_url": "https://bd5492c3ee85.ngrok.io/payments?payment_id=12345678",
+      "sender_staff_code": "online",
+      "note": null,
+      "invoice_receiver_data": {
+          "register": "UZ96021178",
+          "name": "Dulguun",
+          "email": "dulguun@gmail.com",
+          "phone": "88789856"
+      },
+      "transactions": [
+          {
+              "description": "gg",
+              "amount": amount.toString(),
+              "accounts": [
+                  {
+                      "account_bank_code": "390000",
+                      "account_name": "аззаяа",
+                      "account_number": "8000101230",
+                      "account_currency": "MNT",
+                      "is_default": true
+                  }
+              ]
+          }
+          
+      ]
+  };
+
+  const token = await fetchToken();
+  const url = 'https://merchant-sandbox.qpay.mn/v2/invoice';
+
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-      console.log(amount)
-  
-      const data = {
-        "invoice_code": "TEST1_INVOICE",
-        "sender_invoice_no": "MABNK000001",
-        "invoice_receiver_code": "83",
-        "sender_branch_code": "BRANCH1",
-        "invoice_description": "Order No1311 4444.00",
-        "enable_expiry": "false",
-        "allow_partial": false,
-        "minimum_amount": null,
-        "allow_exceed": false,
-        "maximum_amount": null,
-        "amount": amount,
-        "callback_url": "https://bd5492c3ee85.ngrok.io/payments?payment_id=12345678",
-        "sender_staff_code": "online",
-        "note": null,
-        "invoice_receiver_data": {
-            "register": "UZ96021178",
-            "name": "Dulguun",
-            "email": "dulguun@gmail.com",
-            "phone": "88789856"
-        },
-        "transactions": [
-            {
-                "description": "gg",
-                "amount": amount.toString(),
-                "accounts": [
-                    {
-                        "account_bank_code": "390000",
-                        "account_name": "аззаяа",
-                        "account_number": "8000101230",
-                        "account_currency": "MNT",
-                        "is_default": true
-                    }
-                ]
-            }
-            
-        ]
     };
 
-    const token = await fetchToken();
-    const url = 'https://merchant-sandbox.qpay.mn/v2/invoice';
- 
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      };
-  
-      const response = await axios.post(url, data, config);
-  
-      console.log('Response:', response.data);
-  
-      const transaction = new Transaction({
-        status: 'NEW',
-        objectId: response.data.invoice_id, 
-        user: user, 
-        amount: amount.toString(), 
-        qrText: response.data.qr_text,
-        product: product,
-        couponCode: coupon
+    const response = await axios.post(url, data, config);
+
+    console.log('Response:', response.data);
+
+    const transaction = new Transaction({
+      status: 'NEW',
+      objectId: response.data.invoice_id, 
+      user: user, 
+      amount: amount.toString(), 
+      qrText: response.data.qr_text,
+      product: product,
+      couponCode: coupon
+    });
+    await transaction.save();
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        transaction: transaction,
+        qrLink: response.data.qPay_shortUrl
+      }
       });
-      await transaction.save();
-  
-      res.status(200).json({
-        status: 'success',
-        data: {
-          transaction: transaction,
-          qrImage: response.data.qr_image,
-          qrLink: response.data.qPay_shortUrl
-        }
-        });
- 
-    } catch (error) {
-      console.error('Error:', error.message);
-      res.status(500).json({ error: 'Failed to send invoice.' });
+
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).json({ error: 'Failed to send invoice.' });
+  }
+});
+
+router.post('/create-invoice/:chatId/:productId', async (req, res) => {
+  try {
+    const { chatId, productId } = req.params; 
+
+    const user = await User.findOne({chatId: chatId});
+
+    if(!user){
+      return res.status(404).json({message: "user not found!"})
     }
-  });
+
+    const product = await Product.findById(productId)
+
+    if(!product){
+      return res.status(404).json({message: "product not found!"})
+    }
+    console.log(product)
+    let amount = 0;
+
+    if(user.amount){
+      amount = user.amount * product.duration;
+    } else {
+      amount = product.amount * product.duration;
+    }
+    console.log(amount)
+
+    const data = {
+      "invoice_code": "TEST1_INVOICE",
+      "sender_invoice_no": "MABNK000001",
+      "invoice_receiver_code": "83",
+      "sender_branch_code": "BRANCH1",
+      "invoice_description": "Order No1311 4444.00",
+      "enable_expiry": "false",
+      "allow_partial": false,
+      "minimum_amount": null,
+      "allow_exceed": false,
+      "maximum_amount": null,
+      "amount": amount,
+      "callback_url": "https://bd5492c3ee85.ngrok.io/payments?payment_id=12345678",
+      "sender_staff_code": "online",
+      "note": null,
+      "invoice_receiver_data": {
+          "register": "UZ96021178",
+          "name": "Dulguun",
+          "email": "dulguun@gmail.com",
+          "phone": "88789856"
+      },
+      "transactions": [
+          {
+              "description": "gg",
+              "amount": amount.toString(),
+              "accounts": [
+                  {
+                      "account_bank_code": "390000",
+                      "account_name": "аззаяа",
+                      "account_number": "8000101230",
+                      "account_currency": "MNT",
+                      "is_default": true
+                  }
+              ]
+          }
+          
+      ]
+  };
+
+  const token = await fetchToken();
+  const url = 'https://merchant-sandbox.qpay.mn/v2/invoice';
+
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+
+    const response = await axios.post(url, data, config);
+
+    console.log('Response:', response.data);
+
+    const transaction = new Transaction({
+      status: 'NEW',
+      objectId: response.data.invoice_id, 
+      user: user, 
+      amount: amount.toString(), 
+      qrText: response.data.qr_text,
+      product: product
+    });
+    await transaction.save();
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        transaction: transaction,
+        qrLink: response.data.qPay_shortUrl
+      }
+      });
+
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).json({ error: 'Failed to send invoice.' });
+  }
+});
   
   router.post('/call-back/:id', async (req, res) => {
   
