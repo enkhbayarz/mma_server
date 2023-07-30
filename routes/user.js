@@ -15,7 +15,7 @@ router.get('/', async(req, res) => {
         res.status(500).json({message: error.message}) 
     }
   })
-  
+ 
   router.get('/:id', async(req, res) => {
     try {
         const {id} = req.params;
@@ -28,7 +28,33 @@ router.get('/', async(req, res) => {
         res.status(500).json({message: error.message}) 
     }
   })
+
+  router.get('/username/:username', async(req, res) => {
+    try {
+        const {username} = req.params;
+        const user = await User.findOne({telegramName: username});
+ 
+        res.status(200).json(user);
   
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error.message}) 
+    }
+  }) 
+
+  router.get('/chatId/:chatId', async(req, res) => {
+    try {
+        const {chatId} = req.params;
+        const user = await User.findOne({chatId: chatId});
+
+        res.status(200).json(user);
+ 
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error.message}) 
+    }
+  }) 
+
   router.put('/:id', async(req, res) => {
   
     try {
