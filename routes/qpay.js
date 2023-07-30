@@ -139,10 +139,11 @@ router.post('/create-invoice/:chatId/:productId/:coupon', async (req, res) => {
         status: 'success',
         data: {
           transaction: transaction,
-          qr: response.data.urls
+          qrImage: response.data.qr_image,
+          qrLink: response.data.qPay_shortUrl
         }
         });
-  
+ 
     } catch (error) {
       console.error('Error:', error.message);
       res.status(500).json({ error: 'Failed to send invoice.' });
