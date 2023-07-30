@@ -6,7 +6,8 @@ const moment = require('moment');
 const User = require('../models/userModel')
 const Product = require('../models/productModel')
 const Transaction = require('../models/transactionModel')
-const Extension = require('../models/extentensionModel')
+const Extension = require('../models/extentensionModel');
+const Coupon = require('../models/couponModel');
 
 async function fetchToken() {
   try {
@@ -50,6 +51,12 @@ async function fetchToken() {
 router.post('/create-invoice/:chatId/:productId/:coupon', async (req, res) => {
   try {
     const { chatId, productId, coupon } = req.params; 
+
+    const foundCoupon = await Coupon.findOne({code: coupon})
+
+    if(!foundCoupon){
+      return res.status(404).json({message: "coupon not found!"})
+    }
 
     const user = await User.findOne({chatId: chatId});
 
