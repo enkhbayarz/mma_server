@@ -317,13 +317,19 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
           const addedDate = moment(currentDate).add(foundProduct.duration, 'months').format('YYYY-MM-DD');
 
           console.log(addedDate)
-  
+ 
           const extension = new Extension({
             startDate: moment(currentDate).format('YYYY-MM-DD'), 
-            endDate:addedDate, 
+            endDate: addedDate, 
             product: foundProduct,
             user: foundUser
           })
+
+          foundUser.startDate = moment(currentDate).format('YYYY-MM-DD')
+          foundUser.endDate = addedDate
+          foundUser.markModified('startDate');
+          foundUser.markModified('endDate');
+
           await extension.save();
         } else {
           const currentDate = moment(foundExtentension.endDate, 'YYYY-MM-DD').toDate();
@@ -334,6 +340,8 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
           const futureDate = moment(currentDate).add(foundProduct.duration, 'months').format('YYYY-MM-DD');
 
           console.log(`futureDate: ${futureDate}`)
+
+          foundUser.endDate = futureDate
 
           const extension = new Extension({
             startDate: moment(currentDate).format('YYYY-MM-DD'), 
@@ -349,13 +357,13 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
           foundUser.amount = foundProduct.amount;
           console.log(foundUser);
           foundUser.markModified('amount');
-          await foundUser.save();
         }
-
+       
+        await foundUser.save();
         await transaction.save();
 
         if(transaction.couponCode){
-          const responseCoupon = await axios.post(`http://localhost:3000/coupon/${transaction.user._id}/${transaction.couponCode}`);
+          const responseCoupon = await axios.post(`https://mma-service.onrender.com/coupon/${transaction.user._id}/${transaction.couponCode}`);
           console.log(responseCoupon.data)
         }
 

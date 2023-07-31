@@ -3,6 +3,8 @@ const mongoose = require('mongoose')
 const userSchema = mongoose.Schema({
         telegramName : String,
         instagramName: String,
+        startDate: String,
+        endDate: String,
         phone: String,
         chatId: String,
         amount: Number,
