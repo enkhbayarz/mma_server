@@ -25,7 +25,10 @@ async function fetchToken() {
         'Content-Type': 'application/json',
       },
     };
-
+    // Request body (if needed)
+    const requestBody = {
+      // Add any request body data if required by the API
+    };
     // Make the POST request
     const response = await axios.post(apiUrl, requestBody, config);
     console.log(response.data)
