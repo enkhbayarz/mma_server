@@ -19,12 +19,6 @@ async function fetchToken() {
     const password = '123456';
     const basicAuthHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
 
-    // Request body (if needed)
-    const requestBody = {
-      // Add any request body data if required by the API
-    };
-
-    // Request config with headers and basic auth
     const config = {
       headers: {
         'Authorization': basicAuthHeader,
@@ -136,7 +130,6 @@ router.post('/create-invoice/:chatId/:productId/:coupon', async (req, res) => {
       objectId: response.data.invoice_id, 
       user: user, 
       amount: amount.toString(), 
-      qrText: response.data.qr_text,
       product: product,
       couponCode: coupon
     });
@@ -238,7 +231,6 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
       objectId: response.data.invoice_id, 
       user: user, 
       amount: amount.toString(), 
-      qrText: response.data.qr_text,
       product: product
     });
     await transaction.save();

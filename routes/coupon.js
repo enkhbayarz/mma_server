@@ -34,7 +34,38 @@ router.post('/generate/:id', async(req, res) => {
     }
   
   })
+
+  router.post('/generate/chatId/:chatId', async(req, res) => {
+
+    try {
+      
+        const {chatId} = req.params;
+        const user = await User.findOne({chatId: chatId});
+ 
+        if(!user){
+          return res.status(404).json({message: "user not found"})
+        }
+        const foundCoupon = await Coupon.findOne({generatedUser : user._id});
   
+       if(foundCoupon){
+        return res.status(404).json({message: "user already generated Coupon"})
+       }
+  
+        const randomNumber = Math.floor(1000 + Math.random() * 9000);
+        const couponCode = `${user.telegramName.slice(0, 4)}${randomNumber}`.toUpperCase();
+  
+        const newCoupon = new Coupon({ code: couponCode, generatedUser: user });
+        await newCoupon.save();
+  
+        res.status(200).json(newCoupon)
+ 
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error.message}) 
+    }
+  
+  }) 
+
   router.post('/:id/:coupon', async(req, res) => {
   
     try {
