@@ -48,9 +48,10 @@ router.post('/generate/:id', async(req, res) => {
         const foundCoupon = await Coupon.findOne({generatedUser : user._id});
   
        if(foundCoupon){
-        return res.status(404).json({message: "user already generated Coupon"})
+
+        return res.status(200).json(foundCoupon)
        }
-  
+ 
         const randomNumber = Math.floor(1000 + Math.random() * 9000);
         const couponCode = `${user.telegramName.slice(0, 4)}${randomNumber}`.toUpperCase();
   
