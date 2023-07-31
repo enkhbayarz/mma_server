@@ -17,7 +17,8 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "mongoose": "^6.10.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "node-cron": "^3.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
