@@ -1,10 +1,13 @@
 const mongoose = require('mongoose')
 
 const questionSchema = mongoose.Schema({
-        question1 : String,
-        question2: String,
-        question3: String,
-        question4: String
+    question_health : String,
+    question_address : String,
+    question_relation : String,
+    question_money_flow: String,
+    question_goal_1month: String,
+    question_goal_1year: String,
+    question_daily_routine: String
     }, {
         timestamps: true
     });

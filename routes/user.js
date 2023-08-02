@@ -93,13 +93,13 @@ router.get('/', async(req, res) => {
     }
   
   })
-  
+
   router.post('/', async(req, res) => {
   
     try {
         console.log(req.body)
         
-        const { telegramName, instagramName, phone, chatId, questions } = req.body;
+        const { telegramName, chatId } = req.body;
 
         const foundUser = await User.findOne({telegramName: telegramName});
 
@@ -107,32 +107,57 @@ router.get('/', async(req, res) => {
           foundUser.chatId = chatId;
           await foundUser.save()
           return res.status(200).json(foundUser) 
-        }
- 
-        const newUser = new User({
+        } else {
+          const newUser = new User({
             telegramName,
-            instagramName,
-            phone,
             chatId,
-        });
+          });
+
+          await User.create(newUser)
+    
+          res.status(200).json(newUser)
+    
+        }
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error.message}) 
+    }
  
-        if (questions && questions.length > 0) {
-            for (const q of questions) {
-              const newQuestion = new Question({
-                question1: q.question1,
-                question2: q.question2,
-                question3: q.question3,
-                question4: q.question4,
-              });
-              await Question.create(newQuestion);
-              newUser.questions
-              newUser.questions.push(newQuestion);
-            }
-          }        
+  })
+ 
+  router.post('/full', async(req, res) => {
   
-        await User.create(newUser)
+    try {
+        console.log(req.body)
+        
+        const { instagramName, phone, chatId, questions } = req.body;
+
+        const foundUser = await User.findOne({chatId: chatId});
+
+        console.log(foundUser)
+
+        if(foundUser){
+          foundUser.instagramName = instagramName
+          foundUser.phone = phone
+
+          const newQuestion = new Question({
+            question_health: questions.question_health,
+            question_address: questions.question_address,
+            question_relation: questions.question_relation,
+            question_money_flow: questions.question_money_flow,
+            question_goal_1month: questions.question_goal_1month,
+            question_goal_1year: questions.question_goal_1year,
+            question_daily_routine: questions.question_daily_routine
+          });
+
+          foundUser.questions = newQuestion
+          await Question.create(newQuestion);
+          await foundUser.save()
+          return res.status(200).json(foundUser) 
+        }
+        return res.status(404).json({message: "user not found"})
   
-        res.status(200).json(newUser)
   
     } catch (error) {
         console.log(error)

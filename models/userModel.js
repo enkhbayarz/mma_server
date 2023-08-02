@@ -8,10 +8,10 @@ const userSchema = mongoose.Schema({
         phone: String,
         chatId: String,
         amount: Number,
-        questions: [{
+        questions: {
             type: mongoose.Schema.Types.ObjectId, 
             ref: 'Question'
-        }]
+        }
     }, {
         timestamps: true
     });
