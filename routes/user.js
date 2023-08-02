@@ -100,14 +100,22 @@ router.get('/', async(req, res) => {
         console.log(req.body)
         
         const { telegramName, instagramName, phone, chatId, questions } = req.body;
-  
+
+        const foundUser = await User.findOne({telegramName: telegramName});
+
+        if(foundUser){
+          foundUser.chatId = chatId;
+          await foundUser.save()
+          return res.status(200).json(foundUser) 
+        }
+ 
         const newUser = new User({
             telegramName,
             instagramName,
             phone,
             chatId,
         });
-  
+ 
         if (questions && questions.length > 0) {
             for (const q of questions) {
               const newQuestion = new Question({
