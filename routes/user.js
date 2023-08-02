@@ -19,7 +19,7 @@ router.get('/', async(req, res) => {
   router.get('/:id', async(req, res) => {
     try {
         const {id} = req.params;
-        const user = await User.findById(id);
+        const user = await User.findById(id).populate('questions').exec();
   
         res.status(200).json(user);
   
@@ -45,7 +45,7 @@ router.get('/', async(req, res) => {
   router.get('/chatId/:chatId', async(req, res) => {
     try {
         const {chatId} = req.params;
-        const user = await User.findOne({chatId: chatId});
+        const user = await User.findOne({chatId: chatId}).populate('questions').exec();
 
         res.status(200).json(user);
  
