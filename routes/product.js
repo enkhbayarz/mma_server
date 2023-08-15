@@ -1,6 +1,7 @@
 const express = require('express')
 let router = express.Router()
 const Product = require('../models/productModel')
+const User = require('../models/userModel')
 
 //Product
 router.get('/', async (req, res) => {
@@ -29,7 +30,31 @@ router.get('/', async (req, res) => {
       res.status(500).json({ message: 'Failed to fetch the product.' });
     }
   });
+
+  router.get('/chatid/:chatId', async (req, res) => {
+    try {
+      const { chatId } = req.params;
+
+      const user = await User.findOne({chatId: chatId});
+
+      let products = await Product.find();
+
+      if (user) {
+        // Update the amount field of all products to the user's amount
+        const userAmount = user.amount;
+        products = products.map(product => {
+          return { ...product.toObject(), amount: userAmount };
+        });
+      }
   
+      res.status(200).json(products);
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Failed to fetch the product.' });
+    }
+  });
+
   // Update a product by ID
   router.put('/:id', async (req, res) => {
     try {
