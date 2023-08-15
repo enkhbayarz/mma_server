@@ -45,8 +45,8 @@ router.post('/generate/:id', async(req, res) => {
         if(!user){
           return res.status(404).json({message: "user not found"})
         }
-        const foundCoupon = await Coupon.findOne({generatedUser : user._id});
-  
+        const foundCoupon = await Coupon.findOne({generatedUser : user._id}).populate('generatedUser').exec();
+ 
        if(foundCoupon){
 
         return res.status(200).json(foundCoupon)

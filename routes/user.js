@@ -93,7 +93,7 @@ router.get('/', async(req, res) => {
     }
   
   })
-
+  //anh start daraad orj irhed chat_id telegramName 2 iig avaad hereglegchee uusgej bgaa
   router.post('/', async(req, res) => {
   
     try {
