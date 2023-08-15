@@ -182,6 +182,9 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
     }
     console.log(amount)
 
+    const v4Uuid = uuid.v4();
+    console.log("UUID v4:", v4Uuid);
+
     const data = {
       "invoice_code": "TEST1_INVOICE",
       "sender_invoice_no": "MABNK000001",
@@ -239,7 +242,8 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
       objectId: response.data.invoice_id, 
       user: user, 
       amount: amount.toString(), 
-      product: product
+      product: product,
+      uid: v4Uuid
     });
     await transaction.save();
 
