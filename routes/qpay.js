@@ -2,6 +2,7 @@ const express = require('express')
 let router = express.Router()
 const axios = require('axios');
 const moment = require('moment');
+const uuid = require('uuid');
 
 const User = require('../models/userModel')
 const Product = require('../models/productModel')
@@ -76,6 +77,9 @@ router.post('/create-invoice/:chatId/:productId/:coupon', async (req, res) => {
     }
     console.log(amount)
 
+    const v4Uuid = uuid.v4();
+    console.log("UUID v4:", v4Uuid);
+
     const data = {
       "invoice_code": "TEST1_INVOICE",
       "sender_invoice_no": "MABNK000001",
@@ -134,7 +138,8 @@ router.post('/create-invoice/:chatId/:productId/:coupon', async (req, res) => {
       user: user, 
       amount: amount.toString(), 
       product: product,
-      couponCode: coupon
+      couponCode: coupon,
+      uid: v4Uuid
     });
     await transaction.save();
 

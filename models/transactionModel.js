@@ -6,6 +6,7 @@ const transactionSchema = mongoose.Schema({
   amount: String,
   qrText: String,
   couponCode: String,
+  uid: String,
   user :{ 
     type: mongoose.Schema.Types.ObjectId,
      ref: 'User' 
