@@ -264,13 +264,23 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
   router.post('/call-back/:id', async (req, res) => {
   
     const { id } = req.params;
-  
+
+    const transaction = await Transaction.findOne({uid: id})
+    if(!transaction){
+      return res.status(404).json({message: "transaction not found!"})
+    }
+    console.log(transaction)
+
+    if(transaction.status === 'PAID'){
+      return res.status(404).json({message: "transaction already paid"}) 
+    }
+    
     const token = await fetchToken();
     const url = 'https://merchant-sandbox.qpay.mn/v2/payment/check';
   
     const data = {
       "object_type" : "INVOICE",
-      "object_id": id,
+      "object_id": transaction.objectId,
       "offset": {
           "page_number": 1,
           "page_limit": 100
@@ -290,20 +300,12 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
       if (response.data.count === 0) {
         console.log('Payment is successful! Stopping callback service.');
   
-        const transaction = await Transaction.findOne({objectId: id})
-        if(!transaction){
-          return res.status(404).json({message: "transaction not found!"})
-        }
-        console.log(transaction)
         const foundUser = await User.findById(transaction.user._id)
 
         if(!foundUser){
           return res.status(404).json({message: "user not found!"})
         } 
 
-        if(transaction.status === 'PAID'){
-          return res.status(404).json({message: "transaction already paid"}) 
-        }
         transaction.status = 'PAID';
       
         const foundExtentension = await Extension.findOne({user: transaction.user._id})
