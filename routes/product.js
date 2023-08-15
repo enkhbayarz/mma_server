@@ -39,9 +39,10 @@ router.get('/', async (req, res) => {
 
       let products = await Product.find();
 
-      if (user) {
+      if (user && user.amount !== undefined) {
         // Update the amount field of all products to the user's amount
         const userAmount = user.amount;
+        console.log(user.amount)
         products = products.map(product => {
           return { ...product.toObject(), amount: userAmount };
         });
