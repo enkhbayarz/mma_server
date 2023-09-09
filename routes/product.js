@@ -4,6 +4,7 @@ const Product = require('../models/productModel')
 const User = require('../models/userModel')
 
 //Product
+//second service
 router.get('/', async (req, res) => {
     try {
       const products = await Product.find();
