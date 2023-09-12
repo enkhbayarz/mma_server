@@ -1,144 +1,144 @@
-const express = require('express')
-let router = express.Router()
-const Coupon = require('../models/couponModel')
-const User = require('../models/userModel');
+// const express = require('express')
+// let router = express.Router()
+// const Coupon = require('../models/couponModel')
+// const User = require('../models/userModel');
 
-//Coupon
-router.post('/generate/:id', async(req, res) => {
+// //Coupon
+// router.post('/generate/:id', async(req, res) => {
 
-    try {
+//     try {
        
-        const {id} = req.params;
-        const user = await User.findById(id);
+//         const {id} = req.params;
+//         const user = await User.findById(id);
   
-        if(!user){
-          return res.status(404).json({message: "user not found"})
-        }
-        const foundCoupon = await Coupon.findOne({generatedUser : user._id});
+//         if(!user){
+//           return res.status(404).json({message: "user not found"})
+//         }
+//         const foundCoupon = await Coupon.findOne({generatedUser : user._id});
   
-       if(foundCoupon){
-        return res.status(404).json({message: "user already generated Coupon"})
-       }
+//        if(foundCoupon){
+//         return res.status(404).json({message: "user already generated Coupon"})
+//        }
   
-        const randomNumber = Math.floor(1000 + Math.random() * 9000);
-        const couponCode = `${user.telegramName.slice(0, 4)}${randomNumber}`.toUpperCase();
+//         const randomNumber = Math.floor(1000 + Math.random() * 9000);
+//         const couponCode = `${user.telegramName.slice(0, 4)}${randomNumber}`.toUpperCase();
   
-        const newCoupon = new Coupon({ code: couponCode, generatedUser: user });
-        await newCoupon.save();
+//         const newCoupon = new Coupon({ code: couponCode, generatedUser: user });
+//         await newCoupon.save();
   
-        res.status(200).json(newCoupon)
+//         res.status(200).json(newCoupon)
   
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({message: error.message}) 
-    }
+//     } catch (error) {
+//         console.log(error)
+//         res.status(500).json({message: error.message}) 
+//     }
   
-  })
+//   })
 
-  router.post('/generate/chatId/:chatId', async(req, res) => {
+//   router.post('/generate/chatId/:chatId', async(req, res) => {
 
-    try {
+//     try {
       
-        const {chatId} = req.params;
-        const user = await User.findOne({chatId: chatId});
+//         const {chatId} = req.params;
+//         const user = await User.findOne({chatId: chatId});
  
-        if(!user){
-          return res.status(404).json({message: "user not found"})
-        }
-        const foundCoupon = await Coupon.findOne({generatedUser : user._id}).populate('generatedUser').exec();
+//         if(!user){
+//           return res.status(404).json({message: "user not found"})
+//         }
+//         const foundCoupon = await Coupon.findOne({generatedUser : user._id}).populate('generatedUser').exec();
  
-       if(foundCoupon){
+//        if(foundCoupon){
 
-        return res.status(200).json(foundCoupon)
-       }
+//         return res.status(200).json(foundCoupon)
+//        }
  
-        const randomNumber = Math.floor(1000 + Math.random() * 9000);
-        const couponCode = `${user.telegramName.slice(0, 4)}${randomNumber}`.toUpperCase();
+//         const randomNumber = Math.floor(1000 + Math.random() * 9000);
+//         const couponCode = `${user.telegramName.slice(0, 4)}${randomNumber}`.toUpperCase();
   
-        const newCoupon = new Coupon({ code: couponCode, generatedUser: user });
-        await newCoupon.save();
+//         const newCoupon = new Coupon({ code: couponCode, generatedUser: user });
+//         await newCoupon.save();
   
-        res.status(200).json(newCoupon)
+//         res.status(200).json(newCoupon)
  
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({message: error.message}) 
-    }
+//     } catch (error) {
+//         console.log(error)
+//         res.status(500).json({message: error.message}) 
+//     }
   
-  }) 
+//   }) 
 
-  router.post('/:id/:coupon', async(req, res) => {
+//   router.post('/:id/:coupon', async(req, res) => {
   
-    try {
+//     try {
        
-        const {id, coupon} = req.params;
-        const user = await User.findById(id);
+//         const {id, coupon} = req.params;
+//         const user = await User.findById(id);
   
-        if(!user){
-          return res.status(404).json({message: "user not found!"})
-        }
-        console.log(user)
-        const foundCoupon = await Coupon.findOne({code : coupon});
+//         if(!user){
+//           return res.status(404).json({message: "user not found!"})
+//         }
+//         console.log(user)
+//         const foundCoupon = await Coupon.findOne({code : coupon});
   
-       if(!foundCoupon){
-        return res.status(404).json({message: "coupon code not found!"})
-       }
+//        if(!foundCoupon){
+//         return res.status(404).json({message: "coupon code not found!"})
+//        }
   
-       console.log(foundCoupon)
+//        console.log(foundCoupon)
   
-       if(foundCoupon.generatedUser._id.equals(user._id)){
-        return res.status(404).json({message: "you can't use your own coupon code"})
-       }
+//        if(foundCoupon.generatedUser._id.equals(user._id)){
+//         return res.status(404).json({message: "you can't use your own coupon code"})
+//        }
   
-       if (foundCoupon.usedUser.includes(user._id)) {
-        return res.status(400).json({ message: "User has already used this coupon!" });
-      }
+//        if (foundCoupon.usedUser.includes(user._id)) {
+//         return res.status(400).json({ message: "User has already used this coupon!" });
+//       }
   
-       foundCoupon.usedUser.push(user)
-       await foundCoupon.save();
+//        foundCoupon.usedUser.push(user)
+//        await foundCoupon.save();
   
-      res.status(200).json({
-        status: 'success',
-        data: foundCoupon
-        })
+//       res.status(200).json({
+//         status: 'success',
+//         data: foundCoupon
+//         })
   
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({message: error.message}) 
-    }
+//     } catch (error) {
+//         console.log(error)
+//         res.status(500).json({message: error.message}) 
+//     }
   
-  })
+//   })
   
-  router.get('/', async(req, res) => {
-    try {
+//   router.get('/', async(req, res) => {
+//     try {
   
-        const coupon = await Coupon.find({});
-        res.status(200).json({
-          status: 'success',
-          data: coupon
-          });
+//         const coupon = await Coupon.find({});
+//         res.status(200).json({
+//           status: 'success',
+//           data: coupon
+//           });
   
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({message: error.message}) 
-    }
-  })
+//     } catch (error) {
+//         console.log(error)
+//         res.status(500).json({message: error.message}) 
+//     }
+//   })
 
-  router.get('/:coupon', async(req, res) => {
-    try {
-        const {coupon} = req.params;
-        const foundCoupon = await Coupon.findOne({code: coupon})
+//   router.get('/:coupon', async(req, res) => {
+//     try {
+//         const {coupon} = req.params;
+//         const foundCoupon = await Coupon.findOne({code: coupon})
 
-        if(!foundCoupon){
-          return res.status(404).json({message: "coupon not found!"})
-        }
+//         if(!foundCoupon){
+//           return res.status(404).json({message: "coupon not found!"})
+//         }
  
-        res.status(200).json(foundCoupon);
+//         res.status(200).json(foundCoupon);
   
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({message: error.message}) 
-    }
-  })
+//     } catch (error) {
+//         console.log(error)
+//         res.status(500).json({message: error.message}) 
+//     }
+//   })
 
-  module.exports = router;
+//   module.exports = router;

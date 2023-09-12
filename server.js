@@ -28,7 +28,6 @@ app.get('/', (req, res) => {
 
 app.use('/user', userRoute);
 app.use('/product', productRoute);
-app.use('/coupon', couponRoute);
 app.use('/transaction', transactionRoute);
 app.use('/extension', extensionRoute);
 app.use('/', qpayRoute);
