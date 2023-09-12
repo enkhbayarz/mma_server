@@ -66,6 +66,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
     if(!user){
       return res.status(404).json({message: "user not found!"})
     }
+    console.log(user)
 
     const product = await Product.findById(productId)
 
@@ -123,6 +124,8 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
           
       ]
   };
+
+  console.log(data)
 
   const token = await fetchToken();
   const url = 'https://merchant.qpay.mn/v2/invoice';
