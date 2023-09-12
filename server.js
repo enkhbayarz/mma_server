@@ -19,7 +19,7 @@ const app = express()
 //midllewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/static', express.static('public'));
+app.use(express.static('public'));
 app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
