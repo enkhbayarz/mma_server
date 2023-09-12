@@ -22,15 +22,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(morgan('dev'));
 
-app.get('/api', (req, res) => {
+app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.use('/api/user', userRoute);
-app.use('/api/product', productRoute);
-app.use('/api/transaction', transactionRoute);
-app.use('/api/extension', extensionRoute);
-app.use('/api', qpayRoute);
+app.use('/user', userRoute);
+app.use('/product', productRoute);
+app.use('/transaction', transactionRoute);
+app.use('/extension', extensionRoute);
+app.use('/', qpayRoute);
 
 async function getUserList() {
   try {
