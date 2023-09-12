@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(morgan('dev'));
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.send('Hello World!')
 })
 
@@ -43,7 +43,7 @@ async function getUserList() {
         const endDate = moment(user.endDate, 'YYYY-MM-DD');
         const now = moment();
         const daysRemaining = endDate.diff(now, 'days');
-        return daysRemaining === 273;
+        return daysRemaining === 7;
       }
       return false;
     });
