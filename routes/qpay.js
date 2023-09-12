@@ -17,10 +17,10 @@ async function fetchToken() {
     const session = await Session.findById("64ffc9516d24cd0e55e3ad62");
 
     if(new Date().getTime() > (session.expires_in * 1000) + 15000) {
-      const apiUrl = 'https://merchant-sandbox.qpay.mn/v2/auth/token';
-
-      const username = 'TEST_MERCHANT';
-      const password = '123456';
+      const apiUrl = 'https://merchant.qpay.mn/v2/auth/token';
+                       
+      const username = 'TUGO116';
+      const password = 'CpWIsFPK';
       const basicAuthHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
   
       const config = {
@@ -86,11 +86,11 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
     console.log("UUID v4:", v4Uuid);
 
     const data = {
-      "invoice_code": "TEST1_INVOICE",
-      "sender_invoice_no": "MABNK000001",
+      "invoice_code": "TUGO116_INVOICE",
+      "sender_invoice_no": `${user.telegramName}`,
       "invoice_receiver_code": "83",
       "sender_branch_code": "BRANCH1",
-      "invoice_description": "Order No1311 4444.00",
+      "invoice_description": `Order ${amount.toString()} ${user.telegramName}`,
       "enable_expiry": "false",
       "allow_partial": false,
       "minimum_amount": null,
@@ -101,20 +101,20 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
       "sender_staff_code": "online",
       "note": null,
       "invoice_receiver_data": {
-          "register": "UZ96021178",
-          "name": "Dulguun",
-          "email": "dulguun@gmail.com",
-          "phone": "88789856"
+          "register": "UK00240730",
+          "name": "Enkhbayar Enkhorkhon",
+          "email": "e.enkhbayat@gmail.com",
+          "phone": "95059075"
       },
       "transactions": [
           {
-              "description": "gg",
+              "description": `${user.telegramName} төлбөр`,
               "amount": amount.toString(),
               "accounts": [
                   {
-                      "account_bank_code": "390000",
-                      "account_name": "аззаяа",
-                      "account_number": "8000101230",
+                      "account_bank_code": "050000",
+                      "account_name": "enkhbayar enkhorkhon",
+                      "account_number": "5175175420",
                       "account_currency": "MNT",
                       "is_default": true
                   }
@@ -125,7 +125,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
   };
 
   const token = await fetchToken();
-  const url = 'https://merchant-sandbox.qpay.mn/v2/invoice';
+  const url = 'https://merchant.qpay.mn/v2/invoice';
 
     const config = {
       headers: {
@@ -187,7 +187,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
         }
     
     const token = await fetchToken();
-    const url = 'https://merchant-sandbox.qpay.mn/v2/payment/check';
+    const url = 'https://merchant.qpay.mn/v2/payment/check';
   
     const data = {
       "object_type" : "INVOICE",
@@ -208,7 +208,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
       const response = await axios.post(url, data, config);
       console.log('Response:', response.data);
   
-      if (response.data.count === 0) {
+      if (response.data.count === 1) {
         console.log('Payment is successful! Stopping callback service.');
 
         transaction.status = 'PAID';
