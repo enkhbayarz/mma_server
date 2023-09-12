@@ -106,23 +106,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
           "name": "Enkhbayar Enkhorkhon",
           "email": "e.enkhbayat@gmail.com",
           "phone": "95059075"
-      },
-      "transactions": [
-          {
-              "description": `${user.telegramName} төлбөр`,
-              "amount": amount.toString(),
-              "accounts": [
-                  {
-                      "account_bank_code": "050000",
-                      "account_name": "enkhbayar enkhorkhon",
-                      "account_number": "5175175420",
-                      "account_currency": "MNT",
-                      "is_default": true
-                  }
-              ]
-          }
-          
-      ]
+      }
   };
 
   console.log(data)
