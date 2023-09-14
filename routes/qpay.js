@@ -98,7 +98,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
       "allow_exceed": false,
       "maximum_amount": null,
       "amount": amount,
-      "callback_url": `https://mma-service.onrender.com/call-back/${v4Uuid}`,
+      "callback_url": `http://54.199.215.22:3000/call-back/${v4Uuid}`,
       "sender_staff_code": "online",
       "note": null,
       "invoice_receiver_data": {
