@@ -9,7 +9,6 @@ require('dotenv').config();
 
 const userRoute = require('./routes/user');
 const productRoute = require('./routes/product')
-const couponRoute = require('./routes/coupon');
 const qpayRoute = require('./routes/qpay');
 const transactionRoute = require('./routes/transaction');
 const extensionRoute = require('./routes/extension')
@@ -34,7 +33,7 @@ app.use('/', qpayRoute);
 
 async function getUserList() {
   try {
-    const response = await axios.get('https://mma-service.onrender.com/user');
+    const response = await axios.get(`${process.env.API_URL}/user`);
 
     const userList = response.data; 
 
@@ -55,9 +54,9 @@ async function getUserList() {
   }
 }
 
-async function sendMessageToBot(chatId, text) {
+async function sendMessageToBot(chatId, text, expireDate) {
   try {
-    const responseMessage = await axios.get(`https://api.telegram.org/bot6463008563:AAG5XPOwVdQv1BAWfY0aG96iEd7bZ6kG54Y/sendMessage?chat_id=${chatId}&text=${text}`);
+    const responseMessage = await axios.get(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${text}expire date: ${expireDate} `);
     console.log(`Message sent to ${chatId}: ${text}`);
   } catch (error) {
     console.error(`Error sending message to ${chatId}:`, error.message);
@@ -67,10 +66,10 @@ async function sendMessageToBot(chatId, text) {
 cron.schedule('02 22 * * *', async () => {
   const userList = await getUserList();
 
-  const messageText = 'Хугацаань дуусаж байгаа учраас сунгалтаа хийгээрэй!!! /payment коммандыг ашиглаарай';
+  const messageText = 'Хугацаань дуусаж байгаа учраас сунгалтаа хийгээрэй!!! /payment коммандыг ашиглаарай ';
 
   userList.forEach((user) => {
-    sendMessageToBot(user.chatId, messageText);
+    sendMessageToBot(user.chatId, messageText, user.endDate);
   });
 });
 

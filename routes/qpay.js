@@ -3,6 +3,7 @@ let router = express.Router()
 const axios = require('axios');
 const moment = require('moment');
 const uuid = require('uuid');
+require('dotenv').config();
 
 const User = require('../models/userModel')
 const Product = require('../models/productModel')
@@ -17,10 +18,10 @@ async function fetchToken() {
     const session = await Session.findById("64ffc9516d24cd0e55e3ad62");
 
     if(new Date().getTime() > (session.expires_in * 1000) + 15000) {
-      const apiUrl = 'https://merchant.qpay.mn/v2/auth/token';
+      const apiUrl = `${process.env.QPAY_URL}/v2/auth/token`;
                        
-      const username = 'TUGO116';
-      const password = 'CpWIsFPK';
+      const username = `${process.env.QPAY_USERNAME}`;
+      const password = `${process.env.QPAY_PASSWORD}`;
       const basicAuthHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
   
       const config = {
@@ -98,7 +99,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
       "allow_exceed": false,
       "maximum_amount": null,
       "amount": amount,
-      "callback_url": `http://54.199.215.22:3000/call-back/${v4Uuid}`,
+      "callback_url": `${process.env.API_URL}/call-back/${v4Uuid}`,
       "sender_staff_code": "online",
       "note": null,
       "invoice_receiver_data": {
@@ -112,7 +113,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
   console.log(data)
 
   const token = await fetchToken();
-  const url = 'https://merchant.qpay.mn/v2/invoice';
+  const url = `${process.env.QPAY_URL}/v2/invoice`;
 
     const config = {
       headers: {
@@ -174,7 +175,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
         }
     
     const token = await fetchToken();
-    const url = 'https://merchant.qpay.mn/v2/payment/check';
+    const url = `${process.env.QPAY_URL}/v2/payment/check`;
   
     const data = {
       "object_type" : "INVOICE",
@@ -219,7 +220,7 @@ router.post('/create-invoice/:chatId/:productId', async (req, res) => {
         await foundUser.save();
         await transaction.save();
 
-        const responseMessage = await axios.get(`https://api.telegram.org/bot6463008563:AAG5XPOwVdQv1BAWfY0aG96iEd7bZ6kG54Y/sendMessage?chat_id=${foundUser.chatId}&text=Төлбөр амжилттай төлөгдлөө`)
+        const responseMessage = await axios.get(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage?chat_id=${foundUser.chatId}&text=Төлбөр амжилттай төлөгдлөө`)
 
         res.status(200).json({
           status: 'success',
